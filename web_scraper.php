@@ -1,18 +1,9 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>NSF-PAR Web Scraper</title>
-    </head>
-    <body>
-        <form action="web_scraper.php" method="get">
-            <label for="award-id">Award ID:</label>
-            <input type="number" id="award-id" name="award-id">
-            <input type="submit" id="submit-button">
-        </form>
-        
-        <?php
-            echo $_GET["award-id"];
-        ?>
-    </body>
-</html>
+<?php
+require 'vendor/autoload.php';
+
+$awardID = readline('NSF Award ID: ');
+$dir = 'https://www.nsf.gov/awardsearch/showAward?AWD_ID=' . $awardID;
+
+$httpClient = new \GuzzleHttp\Client();
+$response = $httpClient->get($dir);
+$htmlString = (string) $response->getBody();
