@@ -1,6 +1,6 @@
 <?php
 
-require 'web_scraper.php';
+require 'sccvo_scraper.php';
 
 $award_ids = get_award_id_from_SCCVO();
 $file_name = 'award_ids.csv';
