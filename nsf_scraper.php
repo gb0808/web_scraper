@@ -1,4 +1,5 @@
 <?php
+
 require 'vendor/autoload.php';
 
 /**
@@ -6,8 +7,8 @@ require 'vendor/autoload.php';
  * NSF Award ID.
  * 
  * @param awardID - The NSF Award ID associated with a project.
- * @return - An associative array where the key is the link to the publication and the value
- *           is the publications BibTex.
+ * @return - A 2D array where each sub array contains the award id, a link to the publication, and 
+ *           the associated BibTex.
  */
 function scrape_nsf($awardID) {
     // Scrape the NSF PAR site
@@ -35,11 +36,14 @@ function scrape_nsf($awardID) {
         $pubXpath = new DOMXPath($pubDoc);
 
         // Extract link to the publication and the assosiated BibTex.
-        $publication_link_path = '//a[@title="Document DOI URL"]';
-        $extracted_publication_link = trim($pubXpath->evaluate($publication_link_path)[0]->getAttribute('href'));
-        $bibtext_path = '//div[@id="cite-bib"]//div[@class="modal-dialog"]//div[@class="modal-content"]//div[@class="modal-body"]';
-        $extracted_bibtext = trim($pubXpath->evaluate($bibtext_path)[0]->textContent.PHP_EOL);
-        $publications[$extracted_publication_link] = $extracted_bibtext;
+        $publication_link_path = '//div//div//strong//a';
+        $raw_link = $pubXpath->evaluate($publication_link_path)[0];
+        if ($raw_link !== null) {
+            $extracted_publication_link = trim($raw_link->getAttribute('href'));
+            $bibtext_path = '//div[@id="cite-bib"]//div[@class="modal-dialog"]//div[@class="modal-content"]//div[@class="modal-body"]';
+            $extracted_bibtext = trim($pubXpath->evaluate($bibtext_path)[0]->textContent.PHP_EOL);
+            $publications[] = [$awardID, $extracted_publication_link, $extracted_bibtext];
+        }
     }
 
     // Return the publications
@@ -53,17 +57,13 @@ function scrape_nsf($awardID) {
  *                       value is the publications BibTex.
  */
 function export_publications($publications) {
-    $csv_data = [['Link', 'BibTex']];
-    foreach ($publications as $link => $bib) {
-        $csv_data[] = [$link, $bib];
-    }   
+    $csv_data = [['Award ID', 'Link', 'BibTex']];
+    $csv_data = array_merge($csv_data, $publications);
     $file_name = 'publications.csv';
-    $f = fopen($file_name, 'w');
-    if ($f === false) {
-        die('Error opening the file ' . $filename);
+    if (($f = fopen($file_name, 'w')) !== false) {
+        foreach ($csv_data as $row) {
+            fputcsv($f, $row);
+        }
+        fclose($f);
     }
-    foreach ($csv_data as $row) {
-        fputcsv($f, $row);
-    }
-    fclose($f);
 }
