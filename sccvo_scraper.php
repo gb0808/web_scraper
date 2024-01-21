@@ -1,28 +1,6 @@
 <?php
 
 /**
- * This function exports an associative array (format: link => bibtex) as a csv file.
- * 
- * @param publications - An associative array where the key is the link to the publication and the 
- *                       value is the publications BibTex.
- */
-function export_publications($publications) {
-    $csv_data = [['Link', 'BibTex']];
-    foreach ($publications as $link => $bib) {
-        $csv_data[] = [$link, $bib];
-    }   
-    $file_name = 'publications.csv';
-    $f = fopen($file_name, 'w');
-    if ($f === false) {
-        die('Error opening the file ' . $filename);
-    }
-    foreach ($csv_data as $row) {
-        fputcsv($f, $row);
-    }
-    fclose($f);
-}
-
-/**
  * This functions scrapes teh SCCVO website for Award IDs
  * 
  * @return - An array holding all the Award IDs.
