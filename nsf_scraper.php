@@ -3,7 +3,7 @@
 require 'vendor/autoload.php';
 
 /**
- * This function scrapes te NSF PAP websites and pulls publications associated with a given
+ * This function scrapes the NSF PAP websites and pulls publications associated with a given
  * NSF Award ID.
  * 
  * @param awardID - The NSF Award ID associated with a project.
